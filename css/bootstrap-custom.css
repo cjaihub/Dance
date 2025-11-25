@@ -1,0 +1,307 @@
+/* css/bootstrap-custom.css */
+:root {
+  --mcm-red: #C62828;
+  --mcm-gold: #D4AF37;
+  --mcm-black: #0A0A0A;
+  --mcm-dark: #1A1A1A;
+  --mcm-darker: #121212;
+  --mcm-light: #2A2A2A;
+  --mcm-white: #FFFFFF;
+  
+  --gradient-premium: linear-gradient(135deg, var(--mcm-red) 0%, var(--mcm-gold) 100%);
+  --gradient-dark: linear-gradient(135deg, var(--mcm-dark) 0%, var(--mcm-black) 100%);
+}
+
+/* Luxury Dark Theme */
+body {
+  background-color: var(--mcm-black);
+  color: var(--mcm-white);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Premium Navbar */
+.navbar-premium {
+  background: var(--gradient-dark) !important;
+  border-bottom: 1px solid var(--mcm-gold);
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.1);
+}
+
+.navbar-brand {
+  font-weight: 700;
+  background: var(--gradient-premium);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 1.5rem;
+}
+
+/* Luxury Cards */
+.card-premium {
+  background: var(--mcm-dark);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.card-premium:hover {
+  transform: translateY(-5px);
+  border-color: var(--mcm-gold);
+  box-shadow: 0 12px 40px rgba(212, 175, 55, 0.2);
+}
+
+.card-header-premium {
+  background: var(--gradient-dark);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+  font-weight: 600;
+}
+
+/* Premium Buttons */
+.btn-premium {
+  background: var(--gradient-premium);
+  border: none;
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-premium:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(198, 40, 40, 0.4);
+  color: white;
+}
+
+.btn-outline-premium {
+  border: 2px solid var(--mcm-gold);
+  color: var(--mcm-gold);
+  background: transparent;
+  font-weight: 600;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-premium:hover {
+  background: var(--mcm-gold);
+  color: var(--mcm-black);
+  transform: translateY(-2px);
+}
+
+/* Luxury Form Controls */
+.form-control-premium {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  color: var(--mcm-white);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.form-control-premium:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--mcm-gold);
+  color: var(--mcm-white);
+  box-shadow: 0 0 0 0.2rem rgba(212, 175, 55, 0.25);
+}
+
+/* Premium Badges */
+.badge-premium {
+  background: var(--gradient-premium);
+  color: white;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+}
+
+/* Enhanced Tables */
+.table-premium {
+  color: var(--mcm-white);
+  border-color: rgba(212, 175, 55, 0.2);
+}
+
+.table-premium thead th {
+  background: var(--mcm-dark);
+  border-color: rgba(212, 175, 55, 0.3);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table-premium tbody tr {
+  transition: all 0.3s ease;
+}
+
+.table-premium tbody tr:hover {
+  background: rgba(212, 175, 55, 0.1);
+}
+
+/* Luxury Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Premium Loading States */
+.loading-premium {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--mcm-gold);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Glass Morphism Effect */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Status Indicators */
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.status-published { background: #10B981; }
+.status-pending { background: #F59E0B; }
+-status-draft { background: #6B7280; }
+.status-processing { background: #3B82F6; }
+.status-rejected { background: #EF4444; }
+
+
+/* Auth Specific Styles */
+.btn-red {
+    background-color: var(--mcm-red);
+    border-color: var(--mcm-red);
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-red:hover {
+    background-color: var(--mcm-red-dark);
+    border-color: var(--mcm-red-dark);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.btn-red:disabled {
+    background-color: var(--mcm-red-light);
+    border-color: var(--mcm-red-light);
+    opacity: 0.7;
+}
+
+/* Router Loading Styles */
+.router-loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 10, 10, 0.9);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(10px);
+}
+
+.router-loading-content {
+    text-align: center;
+    color: white;
+}
+
+.router-loading-content .loading-premium {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 1rem;
+}
+
+/* Form Validation Styles */
+.is-invalid {
+    border-color: #dc3545 !important;
+}
+
+.is-valid {
+    border-color: #198754 !important;
+}
+
+.invalid-feedback {
+    display: none;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+}
+
+.is-invalid ~ .invalid-feedback {
+    display: block;
+}
+
+/* Password Strength Indicator */
+.password-strength {
+    margin-top: 0.5rem;
+}
+
+.strength-text {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.strength-weak { color: #ef4444; }
+.strength-fair { color: #f59e0b; }
+.strength-good { color: #10b981; }
+.strength-strong { color: #10b981; }
+
+:root {
+    --bs-red: #dc3545;
+    --bs-dark: #121212;
+    --bs-darker: #0a0a0a;
+    --bs-dark-card: #1e1e1e;
+    --bs-dark-border: #333333;
+    --bs-dark-text: #e0e0e0;
+}
+
+[data-bs-theme="dark"] {
+    --bs-body-bg: var(--bs-dark);
+    --bs-body-color: var(--bs-dark-text);
+}
+
+.text-red { color: var(--bs-red) !important; }
+.bg-red { background-color: var(--bs-red) !important; }
+.bg-dark-card { background-color: var(--bs-dark-card) !important; }
+
+.btn-red {
+    background-color: var(--bs-red);
+    border-color: var(--bs-red);
+    color: white;
+}
+
+.btn-red:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+    color: white;
+}
