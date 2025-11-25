@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manifested CMS Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-red: #dc3545;
+            --primary-gold: #ffc107;
+            --primary-white: #ffffff;
+            --dark-bg: #121212;
+            --dark-card: #1e1e1e;
+            --dark-border: #333333;
+            --dark-text: #e0e0e0;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            background-color: var(--dark-card);
+            min-height: 100vh;
+            border-right: 1px solid var(--dark-border);
+        }
+
+        .sidebar .nav-link {
+            color: var(--dark-text);
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: var(--primary-red);
+        }
+
+        .topbar {
+            background-color: var(--dark-card);
+            border-bottom: 1px solid var(--dark-border);
+        }
+
+        .card {
+            background-color: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 0.5rem;
+        }
+
+        .metric-card {
+            transition: transform 0.2s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-white);
+        }
+
+        .metric-change.positive {
+            color: #28a745;
+        }
+
+        .metric-change.negative {
+            color: var(--primary-red);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-red);
+            border-color: var(--primary-red);
+        }
+
+        .btn-primary:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+
+        .btn-outline-primary {
+            color: var(--primary-red);
+            border-color: var(--primary-red);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary-red);
+            border-color: var(--primary-red);
+        }
+
+        .text-primary {
+            color: var(--primary-red) !important;
+        }
+
+        .border-primary {
+            border-color: var(--primary-red) !important;
+        }
+
+        .table {
+            color: var(--dark-text);
+        }
+
+        .table th {
+            border-color: var(--dark-border);
+        }
+
+        .table td {
+            border-color: var(--dark-border);
+        }
+
+        .form-control, .form-select {
+            background-color: var(--dark-card);
+            border-color: var(--dark-border);
+            color: var(--dark-text);
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: var(--dark-card);
+            border-color: var(--primary-red);
+            color: var(--dark-text);
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+        }
+
+        .modal-content {
+            background-color: var(--dark-card);
+            border: 1px solid var(--dark-border);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--dark-border);
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--dark-border);
+        }
+
+        .calendar-day {
+            border: 1px solid var(--dark-border);
+            padding: 0.5rem;
+            min-height: 100px;
+            cursor: pointer;
+        }
+
+        .calendar-day:hover {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+
+        .calendar-day.today {
+            background-color: rgba(220, 53, 69, 0.2);
+        }
+
+        .scheduled-post {
+            background-color: rgba(255, 193, 7, 0.2);
+            border-radius: 0.25rem;
+            padding: 0.25rem;
+            margin-bottom: 0.25rem;
+            font-size: 0.8rem;
+        }
+
+        .ai-caption-preview {
+            background-color: rgba(255, 193, 7, 0.1);
+            border: 1px dashed var(--primary-gold);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-connector {
+            border: 1px solid var(--dark-border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .social-connector:hover {
+            border-color: var(--primary-red);
+            transform: scale(1.05);
+        }
+
+        .social-connector.connected {
+            border-color: #28a745;
+        }
+
+        .post-status-published {
+            color: #28a745;
+        }
+
+        .post-status-scheduled {
+            color: var(--primary-gold);
+        }
+
+        .post-status-draft {
+            color: #6c757d;
+        }
+
+        .activity-log {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--dark-border);
+        }
+
+        .log-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-0">
+                <div class="d-flex flex-column p-3">
+                    <a href="#" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none">
+                        <span class="fs-4 text-primary fw-bold">MANIFESTED CMS</span>
+                    </a>
+                    <hr>
+                    <ul class="nav nav-pills flex-column mb-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active" aria-current="page">
+                                <i class="bi bi-speedometer2 me-2"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link">
+                                <i class="bi bi-calendar-event me-2"></i>
+                                Scheduler
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link">
+                                <i class="bi bi-plus-circle me-2"></i>
+                                Create Post
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link">
+                                <i class="bi bi-collection-play me-2"></i>
+                                Media Library
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link">
+                                <i class="bi bi-people me-2"></i>
+                                Users
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link">
+                                <i class="bi bi-graph-up me-2"></i>
+                                Analytics
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link">
+                                <i class="bi bi-sliders me-2"></i>
+                                Settings
+                            </a>
+                        </li>
+                    </ul>
+                    <hr>
+                    <div class="dropdown">
+                        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
+                            <strong>All Hazel</strong>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li><a class="dropdown-item" href="#">Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logout-btn">Sign out</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 ms-sm-auto px-4">
+                <!-- Topbar -->
+                <div class="topbar d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
+                    <h1 class="h2">Dashboard</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-sm btn-outline-primary">Today</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary">Week</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary">Month</button>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createPostModal">
+                            <i class="bi bi-plus-circle me-1"></i> New Post
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Metrics Cards -->
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card metric-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div class="me-3">
+                                        <div class="text-muted small">Total Posts</div>
+                                        <div class="metric-value" id="total-posts">1,456</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="metric-change positive">+4.5%</div>
+                                        <div class="text-muted small">Since last week</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card metric-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div class="me-3">
+                                        <div class="text-muted small">Scheduled Posts</div>
+                                        <div class="metric-value" id="scheduled-posts">345</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="metric-change negative">-0.0%</div>
+                                        <div class="text-muted small">Since last week</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card metric-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div class="me-3">
+                                        <div class="text-muted small">Followers</div>
+                                        <div class="metric-value" id="total-followers">23,456</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="metric-change positive">+2.1%</div>
+                                        <div class="text-muted small">Since last week</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card metric-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div class="me-3">
+                                        <div class="text-muted small">Engagement Rate</div>
+                                        <div class="metric-value" id="engagement-rate">4.8%</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="metric-change positive">+0.3%</div>
+                                        <div class="text-muted small">Since last week</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts and Analytics -->
+                <div class="row mb-4">
+                    <div class="col-lg-8 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Content Performance</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="performanceChart" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Platform Distribution</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="platformChart" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Posts and Calendar -->
+                <div class="row mb-4">
+                    <div class="col-lg-8 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Recent Posts</h5>
+                                <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Content</th>
+                                                <th>Platform</th>
+                                                <th>Status</th>
+                                                <th>Date</th>
+                                                <th>Engagement</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recent-posts-table">
+                                            <!-- Recent posts will be populated here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Content Calendar</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="calendar" class="calendar">
+                                    <!-- Calendar will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Connectors and Activity Log -->
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Social Media Connectors</h5>
+                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#connectAccountModal">
+                                    Connect Account
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3" id="social-connectors">
+                                    <!-- Social connectors will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Recent Activity</h5>
+                            </div>
+                            <div class="card-body activity-log" id="activity-log">
+                                <!-- Activity logs will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Post Modal -->
+    <div class="modal fade" id="createPostModal" tabindex="-1" aria-labelledby="createPostModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createPostModalLabel">Create New Post</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="create-post-form">
+                        <div class="mb-3">
+                            <label for="post-content" class="form-label">Content</label>
+                            <textarea class="form-control" id="post-content" rows="4" placeholder="Write your post content here..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="post-media" class="form-label">Media</label>
+                            <input class="form-control" type="file" id="post-media" multiple>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="post-platforms" class="form-label">Platforms</label>
+                                <select class="form-select" id="post-platforms" multiple>
+                                    <option value="facebook">Facebook</option>
+                                    <option value="instagram">Instagram</option>
+                                    <option value="twitter">Twitter</option>
+                                    <option value="linkedin">LinkedIn</option>
+                                    <option value="youtube">YouTube</option>
+                                    <option value="tiktok">TikTok</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="post-schedule" class="form-label">Schedule</label>
+                                <input type="datetime-local" class="form-control" id="post-schedule">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-outline-warning" id="generate-ai-caption">
+                                <i class="bi bi-magic me-1"></i> Generate AI Caption
+                            </button>
+                            <button type="button" class="btn btn-outline-warning" id="generate-hashtags">
+                                <i class="bi bi-hash me-1"></i> Generate Hashtags
+                            </button>
+                        </div>
+                        <div id="ai-caption-preview" class="ai-caption-preview d-none">
+                            <h6>AI Generated Caption:</h6>
+                            <p id="ai-caption-text"></p>
+                            <button type="button" class="btn btn-sm btn-primary" id="use-ai-caption">Use This Caption</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="save-post-draft">Save as Draft</button>
+                    <button type="button" class="btn btn-primary" id="schedule-post">Schedule Post</button>
+                    <button type="button" class="btn btn-success" id="publish-now">Publish Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Connect Account Modal -->
+    <div class="modal fade" id="connectAccountModal" tabindex="-1" aria-labelledby="connectAccountModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="connectAccountModalLabel">Connect Social Account</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="connect-account-form">
+                        <div class="mb-3">
+                            <label for="account-platform" class="form-label">Platform</label>
+                            <select class="form-select" id="account-platform">
+                                <option value="">Select Platform</option>
+                                <option value="facebook">Facebook</option>
+                                <option value="instagram">Instagram</option>
+                                <option value="twitter">Twitter</option>
+                                <option value="linkedin">LinkedIn</option>
+                                <option value="youtube">YouTube</option>
+                                <option value="tiktok">TikTok</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="account-username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="account-username" placeholder="Enter username">
+                        </div>
+                        <div class="mb-3">
+                            <label for="account-password" class="form-label">Password/API Key</label>
+                            <input type="password" class="form-control" id="account-password" placeholder="Enter password or API key">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="connect-account">Connect Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // DOM Elements
+        const totalPostsEl = document.getElementById('total-posts');
+        const scheduledPostsEl = document.getElementById('scheduled-posts');
+        const totalFollowersEl = document.getElementById('total-followers');
+        const engagementRateEl = document.getElementById('engagement-rate');
+        const recentPostsTable = document.getElementById('recent-posts-table');
+        const socialConnectorsEl = document.getElementById('social-connectors');
+        const activityLogEl = document.getElementById('activity-log');
+        const calendarEl = document.getElementById('calendar');
+        
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            loadDashboardData();
+            loadRecentPosts();
+            loadSocialConnectors();
+            loadActivityLog();
+            initializeCalendar();
+            setupEventListeners();
+        });
+        
+        // Initialize Charts
+        function initializeCharts() {
+            // Performance Chart
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            const performanceChart = new Chart(performanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [
+                        {
+                            label: 'Posts Published',
+                            data: [65, 59, 80, 81, 56, 55, 40, 45, 60, 70, 75, 80],
+                            borderColor: '#dc3545',
+                            backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Engagement Rate',
+                            data: [3.2, 3.8, 4.1, 4.5, 3.9, 4.2, 3.5, 4.0, 4.3, 4.7, 4.8, 5.0],
+                            borderColor: '#ffc107',
+                            backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#e0e0e0'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#e0e0e0'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#e0e0e0'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Platform Distribution Chart
+            const platformCtx = document.getElementById('platformChart').getContext('2d');
+            const platformChart = new Chart(platformCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Facebook', 'Instagram', 'Twitter', 'LinkedIn', 'YouTube', 'TikTok'],
+                    datasets: [{
+                        data: [30, 25, 15, 10, 12, 8],
+                        backgroundColor: [
+                            '#dc3545',
+                            '#ffc107',
+                            '#0dcaf0',
+                            '#0d6efd',
+                            '#ff0000',
+                            '#000000'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#e0e0e0'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Load Dashboard Data
+        function loadDashboardData() {
+            // In a real implementation, this would fetch data from an API
+            // For demo purposes, we'll use static data with some randomization
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                // Update metrics with slight randomization for demo
+                const totalPosts = 1456 + Math.floor(Math.random() * 10);
+                const scheduledPosts = 345 + Math.floor(Math.random() * 5);
+                const totalFollowers = 23456 + Math.floor(Math.random() * 100);
+                const engagementRate = 4.8 + (Math.random() * 0.5 - 0.25);
+                
+                totalPostsEl.textContent = totalPosts.toLocaleString();
+                scheduledPostsEl.textContent = scheduledPosts.toLocaleString();
+                totalFollowersEl.textContent = totalFollowers.toLocaleString();
+                engagementRateEl.textContent = engagementRate.toFixed(1) + '%';
+            }, 500);
+        }
+        
+        // Load Recent Posts
+        function loadRecentPosts() {
+            // Sample data for recent posts
+            const recentPosts = [
+                { id: 1, content: "Exciting news about our new product launch!", platform: "Facebook", status: "published", date: "2023-11-20", engagement: "245" },
+                { id: 2, content: "Behind the scenes at our latest photo shoot", platform: "Instagram", status: "published", date: "2023-11-19", engagement: "189" },
+                { id: 3, content: "Industry insights and trends for 2024", platform: "LinkedIn", status: "scheduled", date: "2023-11-25", engagement: "0" },
+                { id: 4, content: "New tutorial video just dropped!", platform: "YouTube", status: "published", date: "2023-11-18", engagement: "567" },
+                { id: 5, content: "Join our webinar next week", platform: "Twitter", status: "draft", date: "2023-11-17", engagement: "0" }
+            ];
+            
+            recentPostsTable.innerHTML = '';
+            
+            recentPosts.forEach(post => {
+                const row = document.createElement('tr');
+                
+                // Format status with appropriate class
+                let statusClass = '';
+                switch(post.status) {
+                    case 'published':
+                        statusClass = 'post-status-published';
+                        break;
+                    case 'scheduled':
+                        statusClass = 'post-status-scheduled';
+                        break;
+                    default:
+                        statusClass = 'post-status-draft';
+                }
+                
+                // Format date
+                const postDate = new Date(post.date);
+                const formattedDate = postDate.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+                
+                row.innerHTML = `
+                    <td>${post.id}</td>
+                    <td>${post.content.substring(0, 50)}${post.content.length > 50 ? '...' : ''}</td>
+                    <td>${post.platform}</td>
+                    <td><span class="${statusClass}">${post.status}</span></td>
+                    <td>${formattedDate}</td>
+                    <td>${post.engagement}</td>
+                `;
+                
+                recentPostsTable.appendChild(row);
+            });
+        }
+        
+        // Load Social Connectors
+        function loadSocialConnectors() {
+            const platforms = [
+                { name: 'Facebook', icon: 'bi-facebook', color: '#1877f2' },
+                { name: 'Instagram', icon: 'bi-instagram', color: '#e4405f' },
+                { name: 'Twitter', icon: 'bi-twitter', color: '#1da1f2' },
+                { name: 'LinkedIn', icon: 'bi-linkedin', color: '#0a66c2' },
+                { name: 'YouTube', icon: 'bi-youtube', color: '#ff0000' },
+                { name: 'TikTok', icon: 'bi-tiktok', color: '#000000' }
+            ];
+            
+            socialConnectorsEl.innerHTML = '';
+            
+            platforms.forEach(platform => {
+                // Randomly set some as connected for demo
+                const isConnected = Math.random() > 0.5;
+                
+                const connector = document.createElement('div');
+                connector.className = `col-6 col-md-4`;
+                connector.innerHTML = `
+                    <div class="social-connector ${isConnected ? 'connected' : ''}">
+                        <i class="${platform.icon} fs-2" style="color: ${platform.color};"></i>
+                        <div class="mt-2">${platform.name}</div>
+                        <small class="text-muted">${isConnected ? 'Connected' : 'Not Connected'}</small>
+                    </div>
+                `;
+                
+                socialConnectorsEl.appendChild(connector);
+            });
+        }
+        
+        // Load Activity Log
+        function loadActivityLog() {
+            const activities = [
+                { action: 'Created new post: "Product Launch"', time: '10:30 AM' },
+                { action: 'Scheduled post for November 25', time: '09:15 AM' },
+                { action: 'User All Hazel logged in', time: '08:45 AM' },
+                { action: 'Connected Instagram account', time: 'Yesterday, 4:20 PM' },
+                { action: 'Published weekly newsletter', time: 'Yesterday, 2:15 PM' },
+                { action: 'Generated AI caption for post', time: 'November 18, 11:30 AM' }
+            ];
+            
+            activityLogEl.innerHTML = '';
+            
+            activities.forEach(activity => {
+                const logItem = document.createElement('div');
+                logItem.className = 'log-item';
+                
+                logItem.innerHTML = `
+                    <div class="d-flex justify-content-between">
+                        <span>${activity.action}</span>
+                        <small class="text-muted">${activity.time}</small>
+                    </div>
+                `;
+                
+                activityLogEl.appendChild(logItem);
+            });
+        }
+        
+        // Initialize Calendar
+        function initializeCalendar() {
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+            
+            // Generate calendar for current month
+            generateCalendar(currentMonth, currentYear);
+        }
+        
+        // Generate Calendar
+        function generateCalendar(month, year) {
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startingDay = firstDay.getDay();
+            const monthLength = lastDay.getDate();
+            
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"];
+            
+            let calendarHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0">${monthNames[month]} ${year}</h6>
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary me-1" id="prev-month"><i class="bi bi-chevron-left"></i></button>
+                        <button class="btn btn-sm btn-outline-primary" id="next-month"><i class="bi bi-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div class="row text-center fw-bold small mb-2">
+                    <div class="col p-1">Sun</div>
+                    <div class="col p-1">Mon</div>
+                    <div class="col p-1">Tue</div>
+                    <div class="col p-1">Wed</div>
+                    <div class="col p-1">Thu</div>
+                    <div class="col p-1">Fri</div>
+                    <div class="col p-1">Sat</div>
+                </div>
+                <div class="row">
+            `;
+            
+            // Fill in the days
+            let day = 1;
+            for (let i = 0; i < 6; i++) {
+                for (let j = 0; j < 7; j++) {
+                    if (i === 0 && j < startingDay) {
+                        calendarHTML += `<div class="col p-1 calendar-day"></div>`;
+                    } else if (day > monthLength) {
+                        calendarHTML += `<div class="col p-1 calendar-day"></div>`;
+                    } else {
+                        const isToday = day === new Date().getDate() && 
+                                       month === new Date().getMonth() && 
+                                       year === new Date().getFullYear();
+                                       
+                        calendarHTML += `
+                            <div class="col p-1 calendar-day ${isToday ? 'today' : ''}">
+                                <div class="d-flex justify-content-between">
+                                    <span>${day}</span>
+                                </div>
+                                <div class="scheduled-posts-container" data-date="${year}-${month+1}-${day}">
+                                    <!-- Scheduled posts will appear here -->
+                                </div>
+                            </div>
+                        `;
+                        day++;
+                    }
+                }
+                
+                // Stop making rows if we've run out of days
+                if (day > monthLength) {
+                    break;
+                }
+            }
+            
+            calendarHTML += `</div>`;
+            calendarEl.innerHTML = calendarHTML;
+            
+            // Load scheduled posts for the calendar
+            loadScheduledPostsForCalendar(month, year);
+            
+            // Add event listeners for month navigation
+            document.getElementById('prev-month').addEventListener('click', () => {
+                const newMonth = month === 0 ? 11 : month - 1;
+                const newYear = month === 0 ? year - 1 : year;
+                generateCalendar(newMonth, newYear);
+            });
+            
+            document.getElementById('next-month').addEventListener('click', () => {
+                const newMonth = month === 11 ? 0 : month + 1;
+                const newYear = month === 11 ? year + 1 : year;
+                generateCalendar(newMonth, newYear);
+            });
+        }
+        
+        // Load Scheduled Posts for Calendar
+        function loadScheduledPostsForCalendar(month, year) {
+            // Sample scheduled posts for demo
+            const scheduledPosts = [
+                { platform: 'Facebook', date: new Date(year, month, 5) },
+                { platform: 'Instagram', date: new Date(year, month, 5) },
+                { platform: 'Twitter', date: new Date(year, month, 12) },
+                { platform: 'LinkedIn', date: new Date(year, month, 18) },
+                { platform: 'YouTube', date: new Date(year, month, 25) }
+            ];
+            
+            scheduledPosts.forEach(post => {
+                const dateString = `${post.date.getFullYear()}-${post.date.getMonth()+1}-${post.date.getDate()}`;
+                
+                const container = document.querySelector(`.scheduled-posts-container[data-date="${dateString}"]`);
+                if (container) {
+                    const postElement = document.createElement('div');
+                    postElement.className = 'scheduled-post';
+                    postElement.textContent = post.platform;
+                    container.appendChild(postElement);
+                }
+            });
+        }
+        
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Logout button
+            document.getElementById('logout-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Logout functionality would be implemented here');
+            });
+            
+            // Generate AI Caption
+            document.getElementById('generate-ai-caption').addEventListener('click', async function() {
+                const content = document.getElementById('post-content').value;
+                if (!content.trim()) {
+                    alert('Please enter some content to generate a caption');
+                    return;
+                }
+                
+                try {
+                    // Show loading state
+                    const button = this;
+                    const originalText = button.innerHTML;
+                    button.innerHTML = '<i class="bi bi-arrow-repeat spinner-border spinner-border-sm me-1"></i> Generating...';
+                    button.disabled = true;
+                    
+                    const aiCaption = await generateCaption(content);
+                    document.getElementById('ai-caption-text').textContent = aiCaption;
+                    document.getElementById('ai-caption-preview').classList.remove('d-none');
+                    
+                    // Restore button
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                } catch (error) {
+                    console.error('Error generating AI caption:', error);
+                    alert('Failed to generate AI caption. Please try again.');
+                    
+                    // Restore button
+                    const button = document.getElementById('generate-ai-caption');
+                    button.innerHTML = '<i class="bi bi-magic me-1"></i> Generate AI Caption';
+                    button.disabled = false;
+                }
+            });
+            
+            // Use AI Caption
+            document.getElementById('use-ai-caption').addEventListener('click', function() {
+                const aiCaption = document.getElementById('ai-caption-text').textContent;
+                document.getElementById('post-content').value = aiCaption;
+                document.getElementById('ai-caption-preview').classList.add('d-none');
+            });
+            
+            // Generate Hashtags
+            document.getElementById('generate-hashtags').addEventListener('click', async function() {
+                const content = document.getElementById('post-content').value;
+                if (!content.trim()) {
+                    alert('Please enter some content to generate hashtags');
+                    return;
+                }
+                
+                try {
+                    // Show loading state
+                    const button = this;
+                    const originalText = button.innerHTML;
+                    button.innerHTML = '<i class="bi bi-arrow-repeat spinner-border spinner-border-sm me-1"></i> Generating...';
+                    button.disabled = true;
+                    
+                    const hashtags = await generateHashtags(content);
+                    const currentContent = document.getElementById('post-content').value;
+                    document.getElementById('post-content').value = currentContent + '\n\n' + hashtags;
+                    
+                    // Restore button
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                } catch (error) {
+                    console.error('Error generating hashtags:', error);
+                    alert('Failed to generate hashtags. Please try again.');
+                    
+                    // Restore button
+                    const button = document.getElementById('generate-hashtags');
+                    button.innerHTML = '<i class="bi bi-hash me-1"></i> Generate Hashtags';
+                    button.disabled = false;
+                }
+            });
+            
+            // Save Post Draft
+            document.getElementById('save-post-draft').addEventListener('click', function() {
+                savePost('draft');
+            });
+            
+            // Schedule Post
+            document.getElementById('schedule-post').addEventListener('click', function() {
+                savePost('scheduled');
+            });
+            
+            // Publish Now
+            document.getElementById('publish-now').addEventListener('click', function() {
+                savePost('published');
+            });
+            
+            // Connect Account
+            document.getElementById('connect-account').addEventListener('click', function() {
+                connectSocialAccount();
+            });
+        }
+        
+        // AI Functions
+        async function generateCaption(prompt) {
+            // In a real implementation, this would call the OpenAI API
+            // For demo purposes, we'll simulate the response
+            
+            // Simulate API call delay
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // Mock response based on content
+            const responses = [
+                `Check out this amazing content! ${prompt} Don't forget to like and share! ✨`,
+                `We're excited to share: ${prompt} What do you think? Let us know in the comments!`,
+                `Just dropped: ${prompt} 🔥 Make sure to save this for later!`,
+                `You won't believe this: ${prompt} Share with someone who needs to see this!`
+            ];
+            
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+        
+        async function generateHashtags(content) {
+            // In a real implementation, this would call the OpenAI API
+            // For demo purposes, we'll simulate the response
+            
+            // Simulate API call delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Extract keywords and generate hashtags
+            const keywords = content.toLowerCase().split(' ').slice(0, 5);
+            const hashtags = keywords.map(word => `#${word.replace(/[^a-z0-9]/g, '')}`).join(' ');
+            
+            return hashtags + ' #content #socialmedia #trending';
+        }
+        
+        // Save Post
+        function savePost(status) {
+            const content = document.getElementById('post-content').value;
+            const platforms = Array.from(document.getElementById('post-platforms').selectedOptions).map(option => option.value);
+            const schedule = document.getElementById('post-schedule').value;
+            
+            if (!content.trim()) {
+                alert('Please enter post content');
+                return;
+            }
+            
+            if (platforms.length === 0) {
+                alert('Please select at least one platform');
+                return;
+            }
+            
+            // Show success message
+            let message = '';
+            switch(status) {
+                case 'draft':
+                    message = 'Post saved as draft successfully!';
+                    break;
+                case 'scheduled':
+                    message = 'Post scheduled successfully!';
+                    break;
+                case 'published':
+                    message = 'Post published successfully!';
+                    break;
+            }
+            
+            alert(message);
+            
+            // Close modal and reset form
+            bootstrap.Modal.getInstance(document.getElementById('createPostModal')).hide();
+            document.getElementById('create-post-form').reset();
+            document.getElementById('ai-caption-preview').classList.add('d-none');
+            
+            // Refresh dashboard data
+            loadDashboardData();
+            loadRecentPosts();
+            initializeCalendar();
+        }
+        
+        // Connect Social Account
+        function connectSocialAccount() {
+            const platform = document.getElementById('account-platform').value;
+            const username = document.getElementById('account-username').value;
+            const password = document.getElementById('account-password').value;
+            
+            if (!platform || !username || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            // Show success message
+            alert(`${platform.charAt(0).toUpperCase() + platform.slice(1)} account connected successfully!`);
+            
+            // Close modal and reset form
+            bootstrap.Modal.getInstance(document.getElementById('connectAccountModal')).hide();
+            document.getElementById('connect-account-form').reset();
+            
+            // Refresh social connectors
+            loadSocialConnectors();
+            loadActivityLog();
+        }
+    </script>
+</body>
+</html>
